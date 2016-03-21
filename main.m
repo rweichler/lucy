@@ -1,4 +1,4 @@
-#include "substrate.h"
+#include <substrate.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
