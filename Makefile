@@ -19,7 +19,7 @@ $(deb): $(lucy)
 	rm -r tmp
 
 $(lucy): main.m
-	clang $^ $(link) -I/usr/local/include/luajit-2.0 -isysroot $(ISDKP) -mios-version-min=3.0 -arch arm64 -arch armv7 -dynamiclib -o $@ -framework Foundation -Ilib
+	clang $^ $(link) -I/usr/local/include/luajit-2.0 -isysroot $(ISDKP) -mios-version-min=7.0 -arch arm64 -arch armv7 -dynamiclib -o $@ -framework Foundation -Ilib -I/usr/local/include
 
 clean:
 	rm -f $(lucy) $(deb)

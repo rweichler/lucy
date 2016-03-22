@@ -33,7 +33,7 @@ local function find_process(name)
     local current_pid = ffi.C.getpid()..""
     local pid = nil
 
-    for s in ps:gmatch("[^\n]+") do
+    for s in string.gmatch(ps, "[^\n]+") do
         if string.match(s, name) then
             local i = 0
             for s in string.gmatch(s, "%S+") do

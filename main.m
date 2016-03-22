@@ -1,4 +1,3 @@
-#include <substrate.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -25,7 +24,8 @@ static inline void setSettingsNotification(CFNotificationCenterRef center, void 
 }
 
 
-MSInitialize {
+__attribute__((constructor))
+void ayy_lmao() {
     CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
     CFNotificationCenterAddObserver(r, NULL, &setSettingsNotification, (CFStringRef)@"LUA_LOAD_FILE_PLZ", NULL, 0);
 }
