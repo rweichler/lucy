@@ -6,7 +6,7 @@ deb=lucy.deb
 
 all: $(deb)
 
-$(deb): $(lucy)
+$(deb): $(lucy) scripts/*
 	mkdir -p tmp
 	cp -r deb_structure/* tmp/
 	cp -r DEBIAN tmp/
@@ -18,8 +18,16 @@ $(deb): $(lucy)
 	mv tmp.deb $@
 	rm -r tmp
 
-$(lucy): main.m
+$(lucy): bootstrap.m
 	clang $^ $(link) -I/usr/local/include/luajit-2.0 -isysroot $(ISDKP) -mios-version-min=7.0 -arch arm64 -arch armv7 -dynamiclib -o $@ -framework Foundation -Ilib -I/usr/local/include
 
 clean:
 	rm -f $(lucy) $(deb)
+
+install: $(deb)
+ifndef IP
+	$(error IP not defined)
+else
+	scp $(deb) $(IP):.
+	ssh $(IP) "dpkg -i $(deb) && rm $(deb)"
+endif
