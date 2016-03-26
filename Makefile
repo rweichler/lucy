@@ -1,8 +1,26 @@
 ISDKP=$(shell xcrun --sdk iphoneos --show-sdk-path)
 
 link = $(wildcard lib/*.dylib)
-lucy=liblucybootstrap.dylib
+name=liblucybootstrap
+lucy=$(name).dylib
+plist=$(name).plist
 deb=lucy.deb
+
+
+
+SUBSTRATE_DIR=/Library/MobileSubstrate/DynamicLibraries
+LIB_DIR=/usr/local/lib
+
+USE_SUBSTRATE=0
+
+DYLIB_COPY=$(lucy)
+
+ifeq ($(USE_SUBSTRATE), 1)
+	DYLIB_DIR=$(SUBSTRATE_DIR)
+	DYLIB_COPY=$(lucy) $(plist)
+else
+	DYLIB_DIR=$(LIB_DIR)
+endif
 
 all: $(deb)
 
@@ -13,7 +31,7 @@ $(deb): $(lucy) scripts/*
 	cp scripts/lucy.lua tmp/usr/local/bin/lucy
 	cp scripts/objc.lua tmp/usr/local/share/lua/5.1/
 	cp scripts/lucy_load.lua tmp/var/mobile/Library/Preferences/lua/
-	cp $(lucy) tmp/usr/local/lib/
+	cp $(lucy) tmp$(DYLIB_DIR)
 	dpkg-deb -Zgzip -b tmp
 	mv tmp.deb $@
 	rm -r tmp

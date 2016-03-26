@@ -26,7 +26,7 @@ bool class_isMetaClass(Class class);
 Class object_getClass(id self);
 
 const char * method_getTypeEncoding(Method m);
-void NSLog(id fmt, id lol);
+void NSLog(id fmt);
 ]]
 
 
@@ -76,6 +76,7 @@ local msg = function(fptr, ...)
     return f(...)
 end
 
+
 local function first_char_uppercase(str)
     local first_char = string.sub(str, 1, 1)
     return string.upper(first_char) == first_char
@@ -111,4 +112,14 @@ R.release = function(self)
     msg("void,id,id", self, SEL("release"))
 end
 
+R.call = function(self, cmd)
+    return msg("id,id,id", self, SEL(cmd))
+end
+
+R.msg = msg
+R.class = C
+R.SEL = SEL
+R.log = function(fmt)
+    ffi.C.NSLog(R.NSString(fmt))
+end
 return R

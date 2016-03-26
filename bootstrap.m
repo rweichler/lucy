@@ -4,7 +4,9 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Foundation/NSObjCRuntime.h>
 
-static inline void setSettingsNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+#define init() __attribute__((constructor)) void ayy_lmao()
+
+static inline void poop(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
@@ -15,8 +17,8 @@ static inline void setSettingsNotification(CFNotificationCenterRef center, void 
     }
 }
 
-__attribute__((constructor))
-void ayy_lmao() {
+init()
+{
     CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
-    CFNotificationCenterAddObserver(r, NULL, &setSettingsNotification, CFSTR("LUA_LOAD_FILE_PLZ"), NULL, 0);
+    CFNotificationCenterAddObserver(r, NULL, &poop, CFSTR("LUA_LOAD_FILE_PLZ"), NULL, 0);
 }
