@@ -207,7 +207,10 @@ end
 
 if is_piping then -- just process the inputs, no pretty shell needed
     local code = io.input():read("*all")
-    print(SEND_DATA(code))
+    local output = SEND_DATA(code)
+    if #output > 0 then
+        print(output)
+    end
     return
 end
 
