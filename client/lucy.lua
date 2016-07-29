@@ -208,7 +208,7 @@ end
 if is_piping then -- just process the inputs, no pretty shell needed
     local code = io.input():read("*all")
     local output = SEND_DATA(code)
-    if #output > 0 then
+    if output then
         print(output)
     end
     return
@@ -243,13 +243,12 @@ end
 
 function PRINT_RESULT(result)
     local comp = "ERROR: "
-    PRINT("\t")
+    PRINT("      ")
     if string.sub(result, 1, #comp) == comp then
         RED_PRINT(result)
     else
         GREEN_PRINT(result)
     end
-    PRINT("\n")
 end
 
 C.signal(SIGINT, function()
