@@ -22,7 +22,7 @@ function info()
     local size = f:seek("end")
     io.close(f)
     print('Size: '..size)
-    print('Filename: ./debs/'..debfile..'.deb')
+    print('Filename: ./debs/'..debfile)
 end
 
 
