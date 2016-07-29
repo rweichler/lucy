@@ -13,8 +13,14 @@ local debfile = 'lucy.deb'
 
 -- for my repo
 function info()
+    local first = {Package = true, Name = true, Version = true}
+    print('Package: '..packageinfo.Package)
+    print('Name: '..packageinfo.Name)
+    print('Version: '..packageinfo.Version)
     for k,v in pairs(packageinfo) do
-        print(k..': '..v)
+        if not first[k] then
+            print(k..': '..v)
+        end
     end
     local md5sum = string.split(os.capture('md5sum "'..debfile..'"'), ' ')[1]
     print('MD5sum: '..md5sum)
