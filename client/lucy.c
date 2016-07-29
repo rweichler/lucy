@@ -46,6 +46,8 @@ bool l_ipc_send_data(CFMessagePortRef port, const char *cmd, char **result)
 #include <termios.h>
 #define STDIN_FD 0
 // non-canonical mode
+// i have no clue what this does,
+// i just copy pasted it from somewhere
 static struct termios SavedTermAttributes;
 static bool non_canonical_enabled = false;
 bool l_toggle_noncanonical_mode()

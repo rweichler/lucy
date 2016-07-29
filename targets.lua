@@ -9,6 +9,21 @@ local packageinfo = {
     Author = 'Reed Weichler',
     Section = 'Development'
 }
+local debfile = 'lucy.deb'
+
+-- for my repo
+function info()
+    for k,v in pairs(packageinfo) do
+        print(k..': '..v)
+    end
+    local md5sum = string.split(os.capture('md5sum "'..debfile..'"'), ' ')[1]
+    print('MD5sum: '..md5sum)
+    local f = io.open(debfile)
+    local size = f:seek("end")
+    io.close(f)
+    print('Size: '..size)
+    print('Filename: ./debs/'..debfile..'.deb')
+end
 
 
 function default()
@@ -59,10 +74,9 @@ function default()
     -- copy server plist
     os.pexecute("cp res/LucyServer.plist layout/Library/MobileSubstrate/DynamicLibraries/")
 
-
     local d = debber()
     d.input = 'layout'
-    d.output = 'lucy.deb'
+    d.output = debfile
     d.packageinfo = packageinfo
     d:make_deb()
 end
