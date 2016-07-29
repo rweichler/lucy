@@ -1,9 +1,0 @@
-Package: com.r333d.lucy
-Name: Lucy
-Version: 0.1~beta2
-Architecture: iphoneos-arm
-Description: Lua Cycript
-Maintainer: Reed Weichler <rweichler+cydia@gmail.com>
-Depends: luajit
-Author: Reed Weichler
-Section: Development

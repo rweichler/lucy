@@ -1,0 +1,3 @@
+[submodule "LEOS"]
+	path = LEOS
+	url = git@github.com:rweichler/LEOS.git

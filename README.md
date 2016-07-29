@@ -1,21 +1,28 @@
-ALPHA SOFTWARE. Only tested on iOS 8.1.2 arm64.
+# Lucy
 
-Need Mac OS X to build this.
+Lua Cycript
 
-then run something like:
+![](screen.png)
+
+## Why???
+
+Because it's (mostly) written in Lua! It's way less code than Cycript. And thus way easier to maintain.
+
+## That example is really ugly. I don't want to do raw runtime calls.
+
+I know. But that's because I haven't added Objective-C bindings yet. But it's *definitely* doable. Just look at [Wax](https://github.com/alibaba/wax).
+
+# Building
+
+### Requirements
+
+* Mac OS X
+* LuaJIT (`brew install luajit`)
+* LEOS (this is already in the repository)
+
+### The command you need to run
 
 ```
-brew install luajit
+git submodule update --init
 make
-```
-then install it like so
-```
-scp lucy.deb iphone:.
-ssh iphone "dpkg -i lucy.deb"
-```
-
-use one of the examples like this:
-
-```
-lucy SpringBoard print_bundle_to_syslog.lua
 ```
