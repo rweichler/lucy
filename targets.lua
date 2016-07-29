@@ -48,15 +48,15 @@ function default()
     os.pexecute("cp client/lucy.lua layout/usr/local/bin/lucy")
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
-    -- compile tweak
-    b.src_folder = 'tweak'
+    -- compile server
+    b.src_folder = 'server'
     b.src = {
         'tweak.m'
     }
-    b.build_folder = 'build/tweak'
+    b.build_folder = 'build/server'
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
-    -- copy tweak plist
+    -- copy server plist
     os.pexecute("cp res/LucyServer.plist layout/Library/MobileSubstrate/DynamicLibraries/")
 
 
