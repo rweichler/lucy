@@ -4,12 +4,15 @@ function main_loop()
     local count = C.read(STDIN_FD, buffer, 3)
     if count == 0 then return end
 
-    if count == 1 then
-        PRINT_BUFFER()
+    if buffer[0] ~= 27 then
+        PRINT_BUFFER(count)
     end
 
-    local f = KEY[count][buffer[count - 1]]
-    if f then f() end
+    if count == 1 or buffer[0] == 27 then
+        local c = buffer[count - 1]
+        local f = KEY[count][c]
+        if f then f() end
+    end
 end
 
 KEY = {}
@@ -312,20 +315,22 @@ function PROMPT(newline)
     cursor_pos = 1
 end
 
-function PRINT_BUFFER()
-    local c = buffer[0]
-    if C.isprint(c) then
-        local s = string.char(c)
-        if cursor_pos == #command + 1 then
-            PRINT(s)
-            command = command..s
-        else
-            local tail = s..string.sub(command, cursor_pos, #command)
-            command = string.sub(command, 1, cursor_pos - 1)..tail
-            PRINT(tail)
-            CURSOR_LEFT(#tail - 1)
+function PRINT_BUFFER(count)
+    for i=0,count-1 do
+        local c = buffer[i]
+        if C.isprint(c) then
+            local s = string.char(c)
+            if cursor_pos == #command + 1 then
+                PRINT(s)
+                command = command..s
+            else
+                local tail = s..string.sub(command, cursor_pos, #command)
+                command = string.sub(command, 1, cursor_pos - 1)..tail
+                PRINT(tail)
+                CURSOR_LEFT(#tail - 1)
+            end
+            cursor_pos = cursor_pos + 1
         end
-        cursor_pos = cursor_pos + 1
     end
 end
 
