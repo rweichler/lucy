@@ -1,5 +1,4 @@
-#include <CoreFoundation/CoreFoundation.h>
-#include "rocketbootstrap.h"
+#include "lucy.h"
 
 CFMessagePortRef l_ipc_create_port(const char *name)
 {
@@ -32,9 +31,11 @@ bool l_ipc_send_data(CFMessagePortRef port, const char *cmd, char **result)
     if(status != kCFMessagePortSuccess) return false;
     
     if (returnData != NULL) {
-        CFIndex len = CFDataGetLength(returnData);
-        *result = malloc(len * sizeof(byte_t));
-        CFDataGetBytes(returnData, CFRangeMake(0, len), (byte_t *)(*result));
+        if(result != NULL) {
+            CFIndex len = CFDataGetLength(returnData);
+            *result = malloc(len * sizeof(byte_t));
+            CFDataGetBytes(returnData, CFRangeMake(0, len), (byte_t *)(*result));
+        }
         CFRelease(returnData);
     } else if(result != NULL) {
         *result = NULL;

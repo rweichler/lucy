@@ -38,28 +38,29 @@ function default()
     b.compiler = 'clang'
     b.sdk = 'iphoneos'
     b.include_dirs = {
-        'outside_code/include'
+        'outside_code/include',
+        'client',
+        'server',
     }
     b.frameworks = {
-        'CoreFoundation'
+        'Foundation',
     }
     b.archs = {
         'armv7',
-        'arm64'
+        'arm64',
     }
     b.library_dirs = {
-        'outside_code/lib'
+        'outside_code/lib',
     }
     b.libraries = {
         'substrate',
         'rocketbootstrap',
-        'luajit-5.1.2'
+        'luajit-5.1.2',
     }
 
     -- compile client lib
-    b.src_folder = 'client'
     b.src = {
-        'lucy.c'
+        'client/lucy.c',
     }
     b.build_folder = 'build/client'
     b.output = 'layout/usr/local/lib/liblucy.dylib'
@@ -70,10 +71,7 @@ function default()
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
     -- compile server
-    b.src_folder = 'server'
-    b.src = {
-        'tweak.m'
-    }
+    b.src = table.merge(b.src, fs.wildcard('m', 'server'))
     b.build_folder = 'build/server'
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
