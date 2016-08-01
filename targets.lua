@@ -71,7 +71,7 @@ function default()
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
     -- compile server
-    b.src = table.merge(b.src, fs.wildcard('m', 'server'))
+    b.src = table.merge('client/lucy.c', fs.scandir('server/*.m'))
     b.build_folder = 'build/server'
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
