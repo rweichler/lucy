@@ -37,6 +37,7 @@ function default()
     local b = builder('apple')
     b.compiler = 'clang'
     b.sdk = 'iphoneos'
+    b.build_dir = 'build'
     b.include_dirs = {
         'outside_code/include',
         'client',
@@ -62,7 +63,6 @@ function default()
     b.src = {
         'client/lucy.c',
     }
-    b.build_folder = 'build/client'
     b.output = 'layout/usr/local/lib/liblucy.dylib'
     b:link(b:compile())
     -- copy client executable
@@ -72,7 +72,6 @@ function default()
 
     -- compile server
     b.src = table.merge('client/lucy.c', fs.scandir('server/*.m'))
-    b.build_folder = 'build/server'
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
     -- copy server plist
