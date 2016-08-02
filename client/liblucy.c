@@ -1,4 +1,4 @@
-#include "lucy.h"
+#include "liblucy.h"
 
 CFMessagePortRef l_ipc_create_port(const char *name)
 {

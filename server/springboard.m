@@ -14,6 +14,7 @@ int l_remote(lua_State *L)
     strcpy(_code, code);
 
     NSString *identifier = [NSString stringWithFormat:@"com.r333d.lucy.listener.%s", lua_tostring(L, 1)];
+    Log(@"remote %p", CFRunLoopGetCurrent());
 
     CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
     CFNotificationCenterPostNotification(r, (CFStringRef)identifier, NULL, nil, true);
@@ -64,10 +65,10 @@ static CFDataRef apps_ipc_callback(CFMessagePortRef port,
     char yee[len];
     CFDataGetBytes(data, CFRangeMake(0, len), (unsigned char*)yee);
     if(strcmp(yee, "request") == 0) {
-        NSLog(@"Lucy: got request");
+        Log(@"got request %p", CFRunLoopGetCurrent());
         return CFDataCreate(NULL, (const unsigned char *)_code, strlen(_code) + 1);
     } else {
-        NSLog(@"Lucy: got response");
+        Log(@"got response %p", CFRunLoopGetCurrent());
         strcpy(_response, yee);
     }
     return NULL;

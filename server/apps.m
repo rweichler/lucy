@@ -1,5 +1,5 @@
 #include "globals.h"
-#include "lucy.h"
+#include "liblucy.h"
 
 #define IDENTIFIER_BASE ([@"com.r333d.lucy.listener." stringByAppendingString:NSBundle.mainBundle.bundleIdentifier])
 

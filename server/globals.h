@@ -7,6 +7,7 @@
 
 #define LUCY_SERVER_NAME "com.r333d.lucy.console.server"
 #define APPS_IPC_SERVER_NAME "com.r333d.lucy.apps.ipc.server"
+#define Log(format, ...) NSLog(@"Lucy: %@", [NSString stringWithFormat: format, ## __VA_ARGS__])
 
 void springboard_start_server();
 const char *run_lua_code(const char *code, bool *err);

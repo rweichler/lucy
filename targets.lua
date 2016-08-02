@@ -61,17 +61,17 @@ function default()
 
     -- compile client lib
     b.src = {
-        'client/lucy.c',
+        'client/liblucy.c',
     }
     b.output = 'layout/usr/local/lib/liblucy.dylib'
     b:link(b:compile())
     -- copy client executable
     fs.mkdir("layout/usr/local/bin")
-    os.pexecute("cp client/lucy.lua layout/usr/local/bin/lucy")
+    os.pexecute("cp client/shell.lua layout/usr/local/bin/lucy")
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
     -- compile server
-    b.src = table.merge('client/lucy.c', fs.scandir('server/*.m'))
+    b.src = table.merge('client/liblucy.c', fs.scandir('server/*.m'))
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
     -- copy server plist
