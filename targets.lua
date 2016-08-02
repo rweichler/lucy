@@ -39,7 +39,7 @@ function default()
     b.sdk = 'iphoneos'
     b.build_dir = 'build'
     b.include_dirs = {
-        'outside_code/include',
+        'deps/include',
         'client',
         'server',
     }
@@ -51,7 +51,7 @@ function default()
         'arm64',
     }
     b.library_dirs = {
-        'outside_code/lib',
+        'deps/lib',
     }
     b.libraries = {
         'substrate',
