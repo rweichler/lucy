@@ -210,6 +210,7 @@ end
 
 if is_piping then -- just process the inputs, no pretty shell needed
     local code = io.input():read("*all")
+    code = string.sub(code, 1, #code - 1)
     local output = SEND_DATA(code)
     if output then
         print(output)
