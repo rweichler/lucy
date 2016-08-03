@@ -5,7 +5,7 @@
 
 #define IDENTIFIER(x) ([IDENTIFIER_BASE stringByAppendingString:@x])
 
-CFMessagePortRef _port = NULL;
+LMConnection *_port = NULL;
 static inline void callback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
     NSLog(@"Lucy: nsnotifaction recieved");
@@ -19,7 +19,7 @@ static inline void callback(CFNotificationCenterRef center, void *observer, CFSt
     success = l_ipc_send_data(_port, "request", &code);
     if(!success) {
         NSLog(@"Lucy: fucked up");
-        CFRelease(_port);
+        l_ipc_free_port(_port);
         _port = NULL;
         return;
     }
@@ -34,7 +34,7 @@ static inline void callback(CFNotificationCenterRef center, void *observer, CFSt
     success = l_ipc_send_data(_port, result, NULL);
     if(!success) {
         NSLog(@"Lucy: fucked up");
-        CFRelease(_port);
+        l_ipc_free_port(_port);
         _port = NULL;
         return;
     }

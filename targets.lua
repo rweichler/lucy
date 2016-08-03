@@ -54,8 +54,6 @@ function default()
         'deps/lib',
     }
     b.libraries = {
-        'substrate',
-        'rocketbootstrap',
         'luajit-5.1.2',
     }
 

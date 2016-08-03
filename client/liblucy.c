@@ -1,42 +1,34 @@
 #include "liblucy.h"
 
-CFMessagePortRef l_ipc_create_port(const char *name)
+LMConnection * l_ipc_create_port(const char *name)
 {
-    CFStringRef str = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
-    CFMessagePortRef remotePort = rocketbootstrap_cfmessageportcreateremote(nil, str);
-    CFRelease(str);
-    return remotePort;
+    LMConnection *connection = malloc(sizeof(LMConnection));
+    strcpy(connection->serverName, name);
+    return connection;
+}
+
+void l_ipc_free_port(LMConnection *connection)
+{
+    free(connection);
 }
 
 typedef UInt8 byte_t;
-bool l_ipc_send_data(CFMessagePortRef port, const char *cmd, char **result)
+bool l_ipc_send_data(LMConnection *connection, const char *cmd, char **result)
 {
-    size_t cmd_len = strlen(cmd);
-    CFDataRef data = CFDataCreate(NULL, (const byte_t *)cmd, cmd_len + 1);
-    SInt32 messageID = 0x1111; // Arbitrary
-    CFTimeInterval timeout = 10.0;
-
-    CFDataRef returnData = NULL;
-    SInt32 status = CFMessagePortSendRequest(
-        port,
-        messageID,
-        data,
-        timeout,
-        timeout,
-        (result != NULL ? kCFRunLoopDefaultMode : NULL),
-        &returnData
-    );
-    CFRelease(data);
-
-    if(status != kCFMessagePortSuccess) return false;
+    LMResponseBuffer buffer;
+    LMConnectionSendTwoWay(connection, 0x1111, cmd, strlen(cmd) + 1, &buffer);
+    LMMessage *response = &(buffer.message);
     
-    if (returnData != NULL) {
+    if (response != NULL) {
         if(result != NULL) {
-            CFIndex len = CFDataGetLength(returnData);
-            *result = malloc(len * sizeof(byte_t));
-            CFDataGetBytes(returnData, CFRangeMake(0, len), (byte_t *)(*result));
+            const char *data = LMMessageGetData(response);
+            if(data == NULL) {
+                *result = NULL;
+            } else {
+                *result = malloc(sizeof(char) * (strlen(data) + 1));
+                strcpy(*result, data);
+            }
         }
-        CFRelease(returnData);
     } else if(result != NULL) {
         *result = NULL;
     }

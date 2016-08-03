@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <rocketbootstrap.h>
+#define ROCKETBOOTSTRAP_LOAD_DYNAMIC
+#import <LightMessaging.h>
 #import <substrate.h>
 #include <lua.h>
 #include <lualib.h>

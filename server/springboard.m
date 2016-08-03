@@ -3,6 +3,16 @@
 char _code[BUFSIZ];
 char _response[BUFSIZ];
 
+static LMConnection _lucy_connection = {
+    MACH_PORT_NULL,
+    LUCY_SERVER_NAME
+};
+
+static LMConnection _apps_ipc_connection = {
+    MACH_PORT_NULL,
+    APPS_IPC_SERVER_NAME
+};
+
 int l_remote(lua_State *L)
 {
     if(!lua_isstring(L, 1) || !lua_isstring(L, 2)) {
@@ -28,24 +38,32 @@ int l_response(lua_State *L)
     return 1;
 }
 
-static CFDataRef lucy_callback(CFMessagePortRef port,
-                          SInt32 messageID,
-                          CFDataRef data,
-                          void *info)
+static void lucy_callback(CFMachPortRef port,
+                                   LMMessage *request,
+                                   CFIndex size,
+                                   void *info)
 {
-    CFIndex len = CFDataGetLength(data);
-    char yee[len];
-    CFDataGetBytes(data, CFRangeMake(0, len), (unsigned char*)yee);
+    mach_port_t replyPort = request->head.msgh_remote_port;
+    if(size < sizeof(LMMessage)) {
+        LMSendReply(replyPort, NULL, 0);
+        LMResponseBufferFree((LMResponseBuffer *)request);
+        return;
+    }
+
+    const char *data = LMMessageGetData(request);
+
     bool err = false;
     const char *result;
-    if(strcmp(yee, "restart") == 0) {
+    if(strcmp(data, "restart") == 0) {
         restart_lua();
         result = "Restarted Lua state";
     } else {
-        result = run_lua_code(yee, &err);
+        result = run_lua_code(data, &err);
     }
     if(result == NULL) {
-        return NULL;
+        LMSendReply(replyPort, NULL, 0);
+        LMResponseBufferFree((LMResponseBuffer *)request);
+        return;
     }
     char bytes[strlen("ERROR: ") + strlen(result) + 1];
     bytes[0] = 0;
@@ -53,44 +71,36 @@ static CFDataRef lucy_callback(CFMessagePortRef port,
         strcat(bytes, "ERROR: ");
     }
     strcat(bytes, result);
-    return CFDataCreate(NULL, (const unsigned char *)bytes, strlen(bytes) + 1);
+    LMSendReply(replyPort, bytes, strlen(bytes) + 1);
+    LMResponseBufferFree((LMResponseBuffer *)request);
 }
 
-static CFDataRef apps_ipc_callback(CFMessagePortRef port,
-                          SInt32 messageID,
-                          CFDataRef data,
-                          void *info)
+static void apps_ipc_callback(CFMachPortRef port,
+                                   LMMessage *request,
+                                   CFIndex size,
+                                   void *info)
 {
-    CFIndex len = CFDataGetLength(data);
-    char yee[len];
-    CFDataGetBytes(data, CFRangeMake(0, len), (unsigned char*)yee);
-    if(strcmp(yee, "request") == 0) {
+    mach_port_t replyPort = request->head.msgh_remote_port;
+    if(size < sizeof(LMMessage)) {
+        LMSendReply(replyPort, NULL, 0);
+        LMResponseBufferFree((LMResponseBuffer *)request);
+        return;
+    }
+
+    const char *data = LMMessageGetData(request);
+    if(strcmp(data, "request") == 0) {
         Log(@"got request %p", CFRunLoopGetCurrent());
-        return CFDataCreate(NULL, (const unsigned char *)_code, strlen(_code) + 1);
+        LMSendReply(replyPort, _code, strlen(_code) + 1);
     } else {
         Log(@"got response %p", CFRunLoopGetCurrent());
-        strcpy(_response, yee);
+        strcpy(_response, data);
+        LMSendReply(replyPort, NULL, 0);
     }
-    return NULL;
-}
-
-static void start_server(CFStringRef name, CFMessagePortCallBack callback)
-{
-    CFMessagePortRef localPort = CFMessagePortCreateLocal(nil,
-                                 name,
-                                 callback,
-                                 nil,
-                                 nil);
-    rocketbootstrap_cfmessageportexposelocal(localPort);
-    CFRunLoopSourceRef runLoopSource = CFMessagePortCreateRunLoopSource(nil, localPort, 0);
-    CFRunLoopAddSource(CFRunLoopGetCurrent(),
-                       runLoopSource,
-                       kCFRunLoopCommonModes);
-
+    LMResponseBufferFree((LMResponseBuffer *)request);
 }
 
 void springboard_start_server()
 {
-    start_server(CFSTR(LUCY_SERVER_NAME), lucy_callback);
-    start_server(CFSTR(APPS_IPC_SERVER_NAME), apps_ipc_callback);
+    LMStartService(_lucy_connection.serverName, CFRunLoopGetCurrent(), (CFMachPortCallBack)lucy_callback);
+    LMStartService(_apps_ipc_connection.serverName, CFRunLoopGetCurrent(), (CFMachPortCallBack)apps_ipc_callback);
 }
