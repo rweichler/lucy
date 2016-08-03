@@ -46,7 +46,7 @@ Now you're in Messenger. Do whatever you want there.
 
 To get back to SpringBoard:
 
-```lua
+```bash
 lucy# local
 ```
 
@@ -58,4 +58,4 @@ lucy < script.lua
 echo 'local' | lucy
 ```
 
-You can't do it `remote()` in the script because Lucy would send the whole script to SpringBoard, in which it would process it, and then AFTER it was done processing, then it would switch the remote.
+You can't do `remote()` in the same script because Lucy would send the whole script to SpringBoard, in which it would process it, and then AFTER it was done processing, then it would switch the remote.
