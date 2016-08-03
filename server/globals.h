@@ -16,4 +16,3 @@ void restart_lua();
 void apps_create_listener();
 
 int l_remote(lua_State *L);
-int l_response(lua_State *L);

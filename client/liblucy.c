@@ -16,7 +16,7 @@ typedef UInt8 byte_t;
 bool l_ipc_send_data(LMConnection *connection, const char *cmd, char **result)
 {
     LMResponseBuffer buffer;
-    LMConnectionSendTwoWay(connection, 0x1111, cmd, strlen(cmd) + 1, &buffer);
+    LMConnectionSendTwoWay(connection, 0x1111, cmd, cmd == NULL?0:(strlen(cmd) + 1), &buffer);
     LMMessage *response = &(buffer.message);
     
     if (response != NULL) {

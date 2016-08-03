@@ -1,7 +1,9 @@
 #include "globals.h"
 
 char _code[BUFSIZ];
-char _response[BUFSIZ];
+static NSString *_remoteIdentifier = nil;
+static LMMessage *_remoteMessage = nil;
+static mach_port_t _remotePort;
 
 static LMConnection _lucy_connection = {
     MACH_PORT_NULL,
@@ -15,27 +17,15 @@ static LMConnection _apps_ipc_connection = {
 
 int l_remote(lua_State *L)
 {
-    if(!lua_isstring(L, 1) || !lua_isstring(L, 2)) {
-        return luaL_error(L, "expected 2 strings");
+    if(!lua_isstring(L, 1)) {
+        return luaL_error(L, "expected string");
     }
     const char *app = lua_tostring(L, 1);
-    const char *code = lua_tostring(L, 2);
 
-    strcpy(_code, code);
-
-    NSString *identifier = [NSString stringWithFormat:@"com.r333d.lucy.listener.%s", lua_tostring(L, 1)];
-    Log(@"remote %p", CFRunLoopGetCurrent());
-
-    CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
-    CFNotificationCenterPostNotification(r, (CFStringRef)identifier, NULL, nil, true);
+    [_remoteIdentifier release];
+    _remoteIdentifier = [NSString.alloc initWithFormat:@"com.r333d.lucy.listener.%s", lua_tostring(L, 1)];
 
     return 0;   
-}
-
-int l_response(lua_State *L)
-{
-    lua_pushstring(L, _response);
-    return 1;
 }
 
 static void lucy_callback(CFMachPortRef port,
@@ -57,6 +47,17 @@ static void lucy_callback(CFMachPortRef port,
     if(strcmp(data, "restart") == 0) {
         restart_lua();
         result = "Restarted Lua state";
+    } else if(strcmp(data, "local") == 0) {
+        [_remoteIdentifier release];
+        _remoteIdentifier = nil;
+        result = "We're back at SpringBoard";
+    } else if(_remoteIdentifier) {
+        strcpy(_code, data);
+        _remotePort = replyPort;
+        _remoteMessage = request;
+        CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
+        CFNotificationCenterPostNotification(r, (CFStringRef)_remoteIdentifier, NULL, nil, true);
+        return;
     } else {
         result = run_lua_code(data, &err);
     }
@@ -93,8 +94,11 @@ static void apps_ipc_callback(CFMachPortRef port,
         LMSendReply(replyPort, _code, strlen(_code) + 1);
     } else {
         Log(@"got response %p", CFRunLoopGetCurrent());
-        strcpy(_response, data);
         LMSendReply(replyPort, NULL, 0);
+        
+        LMSendReply(_remotePort, data, strlen(data) + 1);
+        LMResponseBufferFree((LMResponseBuffer *)_remoteMessage);
+        _remoteMessage = nil;
     }
     LMResponseBufferFree((LMResponseBuffer *)request);
 }

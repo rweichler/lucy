@@ -45,7 +45,4 @@ void restart_lua()
 
     lua_pushcfunction(L, l_remote);
     lua_setglobal(L, "remote");
-
-    lua_pushcfunction(L, l_response);
-    lua_setglobal(L, "response");
 }

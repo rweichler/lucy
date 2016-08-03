@@ -44,7 +44,7 @@ function default()
         'server',
     }
     b.frameworks = {
-        'Foundation',
+        'CoreFoundation',
     }
     b.archs = {
         'armv7',
@@ -70,6 +70,9 @@ function default()
 
     -- compile server
     b.src = table.merge('client/liblucy.c', fs.scandir('server/*.m'))
+    b.frameworks = {
+        'Foundation'
+    }
     b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
     b:link(b:compile())
     -- copy server plist

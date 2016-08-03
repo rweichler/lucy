@@ -20,31 +20,42 @@ make
 
 # Shit you can do
 
+## Objective-C stuff
+
+So... I don't have Objective-C support builtin yet because my bindings are shit.
+
+But... if you want to use my shit bindings, then [here you go](https://gist.github.com/rweichler/7821b778467855a9f770abf2ac0a9704).
+
+To use them, just do:
+
+```bash
+lucy < objc.lua
+```
+
+Then run `lucy` proper, and then you'll have those shitty Obj-C runtime bindings!
+
 ## IPC
 
 So I have shitty IPC coded in. Just do this:
 
 ```lua
-remote("com.facebook.Messenger", "x = 3; return x")
+lucy# remote("com.facebook.Messenger")
 ```
 
-To execute code on a non-SpringBoard process.
+Now you're in Messenger. Do whatever you want there.
 
-To get the result, you do:
+To get back to SpringBoard:
 
 ```lua
-return response()
+lucy# local
 ```
 
-This should be synchronous. But I'm tired rn. I'll figure it out eventually.
+So, for instance, if you wanted to run a script on Facebook messenger, you'd do:
 
-I want it to be like this eventually:
-
-```lua
-CURRENT_APP = "com.facebook.Messenger"
--- do whatever
-CURRENT_APP = nil
--- back in SpringBoard
+```bash
+echo 'remote("com.facebook.Messenger")' | lucy
+lucy < script.lua
+echo 'local' | lucy
 ```
 
-It's a WIP.
+You can't do it `remote()` in the script because Lucy would send the whole script to SpringBoard, in which it would process it, and then AFTER it was done processing, then it would switch the remote.

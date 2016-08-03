@@ -30,8 +30,14 @@ static inline void callback(CFNotificationCenterRef center, void *observer, CFSt
     if(result == NULL) {
         result = "";
     }
+    char bytes[strlen("ERROR: ") + strlen(result) + 1];
+    bytes[0] = 0;
+    if(err) {
+        strcat(bytes, "ERROR: ");
+    }
+    strcat(bytes, result);
 
-    success = l_ipc_send_data(_port, result, NULL);
+    success = l_ipc_send_data(_port, bytes, NULL);
     if(!success) {
         NSLog(@"Lucy: fucked up");
         l_ipc_free_port(_port);
