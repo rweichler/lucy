@@ -1,5 +1,5 @@
 local packageinfo = {
-    Version = '0.2.1',
+    Version = '0.2.2',
     Depends = 'luajit, mobilesubstrate, com.rpetrich.rocketbootstrap',
     Package = 'com.r333d.lucy',
     Name = 'Lucy',
