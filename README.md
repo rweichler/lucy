@@ -49,3 +49,5 @@ To get back to SpringBoard:
 ```bash
 lucy# local
 ```
+
+Note: piping doesn't work when you're on remote. I'm working on it.
