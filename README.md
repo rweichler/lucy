@@ -49,13 +49,3 @@ To get back to SpringBoard:
 ```bash
 lucy# local
 ```
-
-So, for instance, if you wanted to run a script on Facebook messenger, you'd do:
-
-```bash
-echo 'remote("com.facebook.Messenger")' | lucy
-lucy < script.lua
-echo 'local' | lucy
-```
-
-You can't do `remote()` in the same script because Lucy would send the whole script to SpringBoard, in which it would process it, and then AFTER it was done processing, then it would switch the remote.
