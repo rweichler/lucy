@@ -1,5 +1,8 @@
 #!/usr/bin/env luajit
 
+local port_name = arg[1] or 'default'
+REMOTE_PORT = "com.r333d.lucy."..port_name
+
 function main_loop()
     local count = C.read(STDIN_FD, buffer, 3)
     if count == 0 then return end
@@ -167,7 +170,7 @@ C = ffi.C
 do
     local port
     local function refresh_port()
-        port = lucy.l_ipc_create_port("com.r333d.lucy.console.server")
+        port = lucy.l_ipc_create_port(REMOTE_PORT)
     end
     refresh_port()
     local send_data = lucy.l_ipc_send_data

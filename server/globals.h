@@ -6,7 +6,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#define LUCY_SERVER_NAME "com.r333d.lucy.console.server"
+#define LUCY_SERVER_NAME "com.r333d.lucy.default"
 #define APPS_IPC_SERVER_NAME "com.r333d.lucy.apps.ipc.server"
 #define Log(format, ...) NSLog(@"Lucy: %@", [NSString stringWithFormat: format, ## __VA_ARGS__])
 
