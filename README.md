@@ -2,11 +2,11 @@
 
 ![](screen.png)
 
-This is a remote LuaJIT console for iOS. It it also includes a LuaJIT server in SpringBoard, but you can put it anywhere you want.
+A remote LuaJIT console for iOS
 
-For example, I have a server in EqualizerEverywhere that allows me to debug it.
+This can be used to debug tweaks that utilize Lua, and also can be used to explore SpringBoard if you have a rudimentary understanding of the Objective C runtime.
 
-Eventually, this will be used to explore SpringBoard with ease, and also make debugging tweaks a lot easier, thanks to the dynamicism of LuaJIT.
+Eventually, this will be used to explore SpringBoard with ease like [Cycript](http://cycript.org) (no Obj-C runtime knowledge necessary), and also make debugging tweaks a lot easier, thanks to the dynamicism of LuaJIT.
 
 # Building
 
