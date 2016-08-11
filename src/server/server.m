@@ -37,7 +37,7 @@ static void callback(CFMachPortRef port,
     LMResponseBufferFree((LMResponseBuffer *)request);
 }
 
-void springboard_start_server()
+void server_start()
 {
     LMStartService(LUCY_SERVER_NAME, CFRunLoopGetCurrent(), (CFMachPortCallBack)callback);
 }

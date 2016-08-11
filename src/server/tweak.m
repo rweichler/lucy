@@ -2,5 +2,5 @@
 
 MSInitialize {
     restart_lua();
-    springboard_start_server();
+    server_start();
 }

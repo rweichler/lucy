@@ -9,6 +9,6 @@
 #define LUCY_SERVER_NAME "com.r333d.lucy.default"
 #define Log(format, ...) NSLog(@"Lucy: %@", [NSString stringWithFormat: format, ## __VA_ARGS__])
 
-void springboard_start_server();
+void server_start();
 const char *run_lua_code(const char *code, bool *err);
 void restart_lua();
