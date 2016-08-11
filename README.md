@@ -8,6 +8,8 @@ This can be used to debug tweaks that utilize Lua, and also can be used to explo
 
 Eventually, this will be used to explore SpringBoard with ease like [Cycript](http://cycript.org) (no Obj-C runtime knowledge necessary), and also make debugging tweaks a lot easier, thanks to the dynamicism of LuaJIT.
 
+Currently this is only being used to debug EqualizerEverywhere but eventually I plan on opening this up for more general use.
+
 # Building
 
 ### Requirements
