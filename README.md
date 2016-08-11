@@ -8,13 +8,13 @@
 
 * Mac OS X
 * LuaJIT (`brew install luajit`)
-* LEOS (this is already in the repository)
+* [LEOS](http://github.com/rweichler/LEOS) (for building)
 
 ### The command you need to run
 
 ```
 git submodule update --init
-make
+leos
 ```
 
 
