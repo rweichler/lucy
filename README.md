@@ -25,6 +25,7 @@ git submodule update --init
 leos
 ```
 
+That creates a new file `lucy.deb` which you can install on your device.
 
 # Shit you can do
 
