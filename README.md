@@ -57,3 +57,8 @@ lucy# local
 ```
 
 Note: piping doesn't work when you're on remote. I'm working on it.
+
+# Goals
+
+* Painless Objective-C manipulation [(like Wax)](https://github.com/alibaba/wax)
+* Inject into any process
