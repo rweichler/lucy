@@ -42,7 +42,4 @@ void restart_lua()
     }
     L = luaL_newstate();
     luaL_openlibs(L);
-
-    lua_pushcfunction(L, l_remote);
-    lua_setglobal(L, "remote");
 }

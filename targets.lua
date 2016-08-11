@@ -52,7 +52,7 @@ function default()
     b:link(b:compile())
     -- copy client executable
     fs.mkdir("layout/usr/local/bin")
-    os.pexecute("cp client/shell.lua layout/usr/local/bin/lucy")
+    os.pexecute("cp src/client/shell.lua layout/usr/local/bin/lucy")
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
     -- compile server

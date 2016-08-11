@@ -6,6 +6,8 @@ A remote LuaJIT console for iOS
 
 This injects a LuaJIT interpreter into SpringBoard which can be controlled using the `lucy` command.
 
+You can also edit `res/LucyServer.plist` to make it inject wherever you want.
+
 As for practical usage, currently this is only being used to debug EqualizerEverywhere (since it heavily uses Lua). Eventually I plan on opening this up for more general use.
 
 # Building
@@ -39,24 +41,6 @@ lucy < objc.lua
 ```
 
 Then run `lucy` proper, and then you'll have those shitty Obj-C runtime bindings!
-
-## IPC
-
-So I have shitty IPC coded in. Just do this:
-
-```lua
-lucy# remote("com.facebook.Messenger")
-```
-
-Now you're in Messenger. Do whatever you want there.
-
-To get back to SpringBoard:
-
-```bash
-lucy# local
-```
-
-Note: piping doesn't work when you're on remote. I'm working on it.
 
 # Goals
 
