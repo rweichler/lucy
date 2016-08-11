@@ -4,11 +4,9 @@
 
 A remote LuaJIT console for iOS
 
-This can be used to debug tweaks that utilize Lua, and also can be used to explore SpringBoard if you have a rudimentary understanding of the Objective C runtime.
+This injects a LuaJIT interpreter into SpringBoard which can be controlled using the `lucy` command.
 
-Eventually, this will be used to explore SpringBoard with ease like [Cycript](http://cycript.org) (no Obj-C runtime knowledge necessary), and also make debugging tweaks a lot easier, thanks to the dynamicism of LuaJIT.
-
-Currently this is only being used to debug EqualizerEverywhere but eventually I plan on opening this up for more general use.
+As for practical usage, currently this is only being used to debug EqualizerEverywhere (since it heavily uses Lua). Eventually I plan on opening this up for more general use.
 
 # Building
 
