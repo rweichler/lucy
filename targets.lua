@@ -27,8 +27,8 @@ function default()
     b.build_dir = 'build'
     b.include_dirs = {
         'deps/include',
-        'client',
-        'server',
+        'src/client',
+        'src/server',
     }
     b.frameworks = {
         'CoreFoundation',
@@ -46,7 +46,7 @@ function default()
 
     -- compile client lib
     b.src = {
-        'client/liblucy.c',
+        'src/client/liblucy.c',
     }
     b.output = 'layout/usr/local/lib/liblucy.dylib'
     b:link(b:compile())
@@ -56,7 +56,7 @@ function default()
     os.pexecute("chmod +x layout/usr/local/bin/lucy")
 
     -- compile server
-    b.src = table.merge('client/liblucy.c', fs.scandir('server/*.m'))
+    b.src = table.merge('src/client/liblucy.c', fs.scandir('src/server/*.m'))
     b.frameworks = {
         'Foundation'
     }
