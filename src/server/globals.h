@@ -10,5 +10,6 @@
 #define Log(format, ...) NSLog(@"Lucy: %@", [NSString stringWithFormat: format, ## __VA_ARGS__])
 
 void server_start();
-const char *run_lua_code(const char *code, bool *err);
+bool run_lua_code(const char *code, const char **result);
+void unwind_lua_stack();
 void restart_lua();

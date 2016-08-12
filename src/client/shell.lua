@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 
 local port_name = arg[1] or 'default'
-REMOTE_PORT = "com.r333d.lucy."..port_name
+REMOTE_PORT = port_name ~= 'local' and "com.r333d.lucy."..port_name
 
 function main_loop()
     local count = C.read(STDIN_FD, buffer, 3)
@@ -159,7 +159,7 @@ bool isprint(int c);
 void free(void *);
 void system(const char *);
 ]]
-local lucy = ffi.load("/usr/local/lib/liblucy.dylib")
+local lucy = ffi.load("lucy")
 ffi.cdef[[
 void *l_ipc_create_port(const char *name);
 bool l_ipc_send_data(void *port, const char *cmd, char **result);
@@ -167,7 +167,7 @@ bool l_toggle_noncanonical_mode();
 ]]
 local ffi_string = ffi.string
 C = ffi.C
-do
+if REMOTE_PORT then
     local port
     local function refresh_port()
         port = lucy.l_ipc_create_port(REMOTE_PORT)
@@ -190,10 +190,22 @@ do
             return str
         end
     end
-    function EXIT(code)
-        lucy.l_toggle_noncanonical_mode()
-        os.exit(code or 0)
+else
+    function SEND_DATA(cmd)
+        local callback = function(message)
+            return debug.traceback(message, 2)
+        end
+        local success, result = xpcall(load(cmd), callback)
+        if not success then
+            result = 'ERROR: '..result
+        end
+        return tostring(result)
     end
+end
+
+function EXIT(code)
+    lucy.l_toggle_noncanonical_mode()
+    os.exit(code or 0)
 end
 
 
@@ -235,7 +247,7 @@ function run_command()
             result = 'nil'
         end
         if result then
-            PRINT_RESULT(result)
+            PRINT_RESULT(string.gsub(string.gsub(result, '\n\t', '\n    '), '\n', '\n      '))
         else
             result = nil
         end

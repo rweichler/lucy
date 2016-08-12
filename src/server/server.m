@@ -14,13 +14,13 @@ static void callback(CFMachPortRef port,
 
     const char *data = LMMessageGetData(request);
 
-    bool err = false;
+    bool success = true;
     const char *result;
     if(strcmp(data, "restart") == 0) {
         restart_lua();
         result = "Restarted Lua state";
     } else {
-        result = run_lua_code(data, &err);
+        success = run_lua_code(data, &result);
     }
     if(result == NULL) {
         LMSendReply(replyPort, NULL, 0);
@@ -29,10 +29,13 @@ static void callback(CFMachPortRef port,
     }
     char bytes[strlen("ERROR: ") + strlen(result) + 1];
     bytes[0] = 0;
-    if(err) {
+    if(!success) {
         strcat(bytes, "ERROR: ");
     }
     strcat(bytes, result);
+
+    unwind_lua_stack();
+
     LMSendReply(replyPort, bytes, strlen(bytes) + 1);
     LMResponseBufferFree((LMResponseBuffer *)request);
 }

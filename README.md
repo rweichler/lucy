@@ -40,9 +40,15 @@ That creates a new file `lucy.deb` which you can install on your device.
 
 # Running
 
+## Injecting into SpringBoard
+
 Go into terminal, type the `lucy` command. Get Objective-C and Beagle by doing:
 
 ```lua
 objc = require 'objc'
 beagle = require 'beagle'
 ```
+
+## Local shell
+
+`lucy local`
