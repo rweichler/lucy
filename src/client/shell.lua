@@ -173,20 +173,18 @@ do
         port = lucy.l_ipc_create_port(REMOTE_PORT)
     end
     refresh_port()
-    local send_data = lucy.l_ipc_send_data
-    local NULL = ffi.NULL
     local string_ptr = ffi.typeof("char *[1]")
     function SEND_DATA(cmd, should_recieve)
         local result = nil
         if not (should_recieve == false) then
             result = ffi.new(string_ptr)
         end
-        local success = send_data(port, cmd, result) 
+        local success = lucy.l_ipc_send_data(port, cmd, result) 
         if not success then
             print("*** Connection to SpringBoard has been reset")
             EXIT()
         end
-        if result and not (result[0] == NULL) then
+        if result and not (result[0] == ffi.NULL) then
             local str = ffi_string(result[0])
             C.free(result[0])
             return str

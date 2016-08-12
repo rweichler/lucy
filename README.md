@@ -8,7 +8,16 @@ This injects a LuaJIT interpreter into SpringBoard which can be controlled using
 
 You can also edit `res/LucyServer.plist` to make it inject wherever you want.
 
-As for practical usage, currently this is only being used to debug EqualizerEverywhere (since it heavily uses Lua). Eventually I plan on opening this up for more general use.
+# Goals
+
+* Painless ~~Objective-C integration~~ 
+  * [Achieved with objc.lua](http://github.com/rweichler/objc.lua) (still a bit painful, though)
+  * TODO:
+    * Implicit typecasting
+    * Fix C struct support
+* ~~`choose()` function~~ [Achieved with Objective Beagle](http://github.com/rweichler/beagle.lua)
+  * e.g. `beagle('UIWindow')`
+* Inject into any process
 
 # Building
 
@@ -27,23 +36,11 @@ leos
 
 That creates a new file `lucy.deb` which you can install on your device.
 
-# Shit you can do
+# Running
 
-## Objective-C stuff
+Go into terminal, type the `lucy` command. Get Objective-C and Beagle by doing:
 
-So... I don't have Objective-C support builtin yet because my bindings are shit.
-
-But... if you want to use my shit bindings, then [here you go](https://gist.github.com/rweichler/7821b778467855a9f770abf2ac0a9704).
-
-To use them, just do:
-
-```bash
-lucy < objc.lua
+```lua
+objc = require 'objc'
+beagle = require 'beagle'
 ```
-
-Then run `lucy` proper, and then you'll have those shitty Obj-C runtime bindings!
-
-# Goals
-
-* Painless Objective-C manipulation [(like Wax)](https://github.com/alibaba/wax)
-* Inject into any process

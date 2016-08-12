@@ -1,14 +1,15 @@
 local deb = debber()
 deb.packageinfo = {
-    Version = '0.2.4',
-    Depends = 'luajit, mobilesubstrate, com.rpetrich.rocketbootstrap',
+    Version = '0.5',
+    Depends = 'luajit, com.luapower.objc, objcbeagle, mobilesubstrate, com.rpetrich.rocketbootstrap',
     Package = 'com.r333d.lucy',
     Name = 'Lucy',
     Architecture = 'iphoneos-arm',
     Description = 'Lua Cycript',
     Maintainer = 'Reed Weichler <rweichler@gmail.com>',
     Author = 'Reed Weichler',
-    Section = 'Development'
+    Section = 'Development',
+    Depiction = 'http://github.com/rweichler/lucy',
 }
 deb.input = 'layout'
 deb.output = 'lucy.deb'
