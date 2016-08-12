@@ -19,6 +19,10 @@ You can also edit `res/LucyServer.plist` to make it inject wherever you want.
   * e.g. `beagle('UIWindow')`
 * Inject into any process
 
+# Installation
+
+Add http://cydia.r333d.com as a Cydia repo, and install the Lucy package from there.
+
 # Building
 
 ### Requirements
