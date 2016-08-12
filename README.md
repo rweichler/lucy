@@ -2,8 +2,6 @@
 
 ![](screen.png)
 
-A remote LuaJIT console for iOS
-
 This injects a LuaJIT interpreter into SpringBoard which can be controlled using the `lucy` command.
 
 You can also edit `res/LucyServer.plist` to make it inject wherever you want.
