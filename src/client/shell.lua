@@ -62,7 +62,6 @@ KEY[1][0x7f] = KEY[1][0x08]
 --^L
 KEY[1][12] = function()
     local steps = #command + 1 - cursor_pos
-    --CURSOR_RIGHT(steps)
     C.system("clear")
     PRINT(prompt_text)
     PRINT(command)
@@ -175,14 +174,11 @@ if IPC_AVAILABLE and REMOTE_PORT then
     end
     refresh_port()
     local string_ptr = ffi.typeof("char *[1]")
-    function SEND_DATA(cmd, should_recieve)
-        local result = nil
-        if not (should_recieve == false) then
-            result = ffi.new(string_ptr)
-        end
-        local success = lucy.l_ipc_send_data(port, cmd, result) 
+    function RUN_CODE(code)
+        local result = ffi.new(string_ptr)
+        local success = lucy.l_ipc_send_data(port, code, result) 
         if not success then
-            print("*** Connection to SpringBoard has been reset")
+            print("*** Connection has been reset")
             EXIT()
         end
         if result and not (result[0] == ffi.NULL) then
@@ -192,15 +188,20 @@ if IPC_AVAILABLE and REMOTE_PORT then
         end
     end
 else
-    function SEND_DATA(cmd)
+    function RUN_CODE(code)
         local callback = function(message)
             return debug.traceback(message, 2)
         end
-        local success, result = xpcall(load(cmd), callback)
-        if not success then
-            result = 'ERROR: '..result
+        local f, err = load(code)
+        if not f then
+            return 'ERROR: '..err
+        else
+            local success, result = xpcall(f, callback)
+            if not success then
+                result = 'ERROR: '..result
+            end
+            return tostring(result)
         end
-        return tostring(result)
     end
 end
 
@@ -225,7 +226,7 @@ end
 if is_piping then -- just process the inputs, no pretty shell needed
     local code = io.input():read("*all")
     code = string.sub(code, 1, #code - 1)
-    local output = SEND_DATA(code)
+    local output = RUN_CODE(code)
     if output then
         print(output)
     end
@@ -242,7 +243,7 @@ function run_command()
     end
     local result
     if #string.trim(command) > 0 then
-        result = SEND_DATA(command)
+        result = RUN_CODE(command)
         local ret = 'return '
         if string.sub(command, 1, #ret) == ret and not result then
             result = 'nil'
