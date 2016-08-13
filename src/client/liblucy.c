@@ -1,5 +1,6 @@
 #include "liblucy.h"
 
+#if TARGET_OS_IPHONE
 LMConnection * l_ipc_create_port(const char *name)
 {
     LMConnection *connection = malloc(sizeof(LMConnection));
@@ -38,6 +39,7 @@ bool l_ipc_send_data(LMConnection *connection, const char *cmd, char **result)
 
     return true;
 }
+#endif
 
 #include <termios.h>
 #define STDIN_FD 0

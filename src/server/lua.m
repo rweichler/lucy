@@ -40,11 +40,15 @@ bool run_lua_code(const char *code, const char **result)
 
     success = lua_pcall(L, 0, 1, -2) == 0;
 
-    lua_getglobal(L, "tostring");
-    lua_pushvalue(L, -2);
+    if(lua_isnil(L, -1)) {
+        *result = NULL;
+    } else {
+        lua_getglobal(L, "tostring");
+        lua_pushvalue(L, -2);
 
-    lua_pcall(L, 1, 1, 0);
-    *result = lua_tostring(L, -1);
+        lua_pcall(L, 1, 1, 0);
+        *result = lua_tostring(L, -1);
+    }
 
     return success;
 }

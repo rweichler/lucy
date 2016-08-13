@@ -167,7 +167,8 @@ bool l_toggle_noncanonical_mode();
 ]]
 local ffi_string = ffi.string
 C = ffi.C
-if REMOTE_PORT then
+local IPC_AVAILABLE = pcall(function() return lucy.l_ipc_create_port end)
+if IPC_AVAILABLE and REMOTE_PORT then
     local port
     local function refresh_port()
         port = lucy.l_ipc_create_port(REMOTE_PORT)

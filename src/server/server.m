@@ -1,5 +1,6 @@
 #include "globals.h"
 
+#if TARGET_OS_IPHONE
 static void callback(CFMachPortRef port,
                      LMMessage *request,
                      CFIndex size,
@@ -39,8 +40,11 @@ static void callback(CFMachPortRef port,
     LMSendReply(replyPort, bytes, strlen(bytes) + 1);
     LMResponseBufferFree((LMResponseBuffer *)request);
 }
+#endif
 
 void server_start()
 {
+#if TARGET_OS_IPHONE
     LMStartService(LUCY_SERVER_NAME, CFRunLoopGetCurrent(), (CFMachPortCallBack)callback);
+#endif
 }

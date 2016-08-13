@@ -19,8 +19,11 @@ function info()
     deb:print_packageinfo()
 end
 
-
 function default()
+    jb()
+end
+
+function jb()
     -- setup builder
     local b = builder('apple')
     b.compiler = 'clang'

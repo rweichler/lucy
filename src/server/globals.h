@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
+#if TARGET_OS_IPHONE
 #define ROCKETBOOTSTRAP_LOAD_DYNAMIC
 #import <LightMessaging.h>
+#endif
 #import <substrate.h>
 #include <lua.h>
 #include <lualib.h>
