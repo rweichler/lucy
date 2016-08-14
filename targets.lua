@@ -24,6 +24,7 @@ function default()
 end
 
 function jb()
+    os.pexecute("rm -rf layout")
     -- setup builder
     local b = builder('apple')
     b.compiler = 'clang'
@@ -56,8 +57,11 @@ function jb()
     b:link(b:compile())
     -- copy client executable
     fs.mkdir("layout/usr/local/bin")
-    os.pexecute("cp src/client/shell.lua layout/usr/local/bin/lucy")
-    os.pexecute("chmod +x layout/usr/local/bin/lucy")
+    local lua_lib = 'layout/usr/local/share/lua/5.1/lucy'
+    fs.mkdir(lua_lib)
+    os.pexecute("cp src/shell/* "..lua_lib)
+    os.pexecute("chmod +x "..lua_lib.."/init.lua")
+    os.pexecute("ln -s ../share/lua/5.1/lucy/init.lua layout/usr/local/bin/lucy")
 
     -- compile server
     b.src = table.merge('src/client/liblucy.c', fs.scandir('src/server/*.m'))

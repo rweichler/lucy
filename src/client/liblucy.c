@@ -42,16 +42,14 @@ bool l_ipc_send_data(LMConnection *connection, const char *cmd, char **result)
 #endif
 
 #include <termios.h>
-#define STDIN_FD 0
-// non-canonical mode
-// i have no clue what this does,
-// i just copy pasted it from somewhere
-static struct termios SavedTermAttributes;
+// this makes it an actual shell.
+// it basically suppresses echoing
+// and stuff like that.
+static struct termios _defaultAttrs;
 static bool non_canonical_enabled = false;
 bool l_toggle_noncanonical_mode()
 {
-    int fd = STDIN_FD;
-    struct termios *savedattributes = &SavedTermAttributes;
+    int fd = STDIN_FILENO;
 
     // Make sure stdin is a terminal. 
     if(!isatty(fd)){
@@ -59,23 +57,22 @@ bool l_toggle_noncanonical_mode()
     }
 
     if(non_canonical_enabled) {
-        tcsetattr(STDIN_FILENO, TCSANOW, savedattributes);
+        tcsetattr(fd, TCSANOW, &_defaultAttrs);
         non_canonical_enabled = false;
         return false;
     }
 
-    struct termios TermAttributes;
-    char *name;
+    struct termios attrs;
 
     // Save the terminal attributes so we can restore them later. 
-    tcgetattr(fd, savedattributes);
+    tcgetattr(fd, &_defaultAttrs);
 
     // Set the funny terminal modes. 
-    tcgetattr (fd, &TermAttributes);
-    TermAttributes.c_lflag &= ~(ICANON | ECHO); // Clear ICANON and ECHO. 
-    TermAttributes.c_cc[VMIN] = 1;
-    TermAttributes.c_cc[VTIME] = 0;
-    tcsetattr(fd, TCSAFLUSH, &TermAttributes);
+    tcgetattr (fd, &attrs);
+    attrs.c_lflag &= ~(ICANON | ECHO); // Clear ICANON and ECHO. 
+    attrs.c_cc[VMIN] = 1;
+    attrs.c_cc[VTIME] = 0;
+    tcsetattr(fd, TCSAFLUSH, &attrs);
     non_canonical_enabled = true;
     return true;
 }
