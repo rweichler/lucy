@@ -27,7 +27,7 @@ Add http://cydia.r333d.com as a Cydia repo, and install the Lucy package from th
 
 * Mac OS X
 * LuaJIT (`brew install luajit`)
-* [LEOS](http://github.com/rweichler/LEOS) (for building)
+* [LEOS](http://github.com/rweichler/LEOS) (for building) (I'm sorry)
 
 ### The command you need to run
 

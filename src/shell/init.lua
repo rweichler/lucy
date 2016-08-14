@@ -36,6 +36,13 @@ STDOUT_FD = 1
 STDRERR_FD = 2
 
 if noncanon.toggle() then 
+    if RUN_CODE == RUN_CODE_LOCALLY then
+        -- tell user that we are not hooked into
+        -- a process, since a lot of first-time users
+        -- probably will just type "lucy", expecting to be
+        -- hooked into SpringBoard or something
+        MAGENTA_PRINT("Running local shell. Not hooking anything.\n")
+    end
     -- start the REPL.
     buffer = ffi.new("char[3]")
     history = {}
