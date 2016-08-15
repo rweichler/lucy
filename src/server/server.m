@@ -39,8 +39,7 @@ void server_start()
 #if TARGET_OS_IPHONE
     LMService service = {
         LUCY_SERVER_NAME,
-        CFRunLoopGetCurrent(),
-        NULL
+        CFRunLoopGetCurrent()
     };
     LMStartService(&service, callback);
 #endif
