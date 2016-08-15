@@ -1,3 +1,12 @@
+--[[
+
+How to build this:
+
+Go to http://github.com/rweichler/aite and install that. I promise it's easy.
+Come back here, and run the `aite` command.
+
+--]]
+
 local deb = debber()
 deb.packageinfo = {
     Version = '0.5',
