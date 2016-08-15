@@ -20,10 +20,11 @@ function RUN_CODE_LOCALLY(code)
         return 'ERROR: '..err
     else
         local success, result = xpcall(f, callback)
+        result = tostring(result)
         if not success then
             result = 'ERROR: '..result
         end
-        return tostring(result)
+        return result
     end
 end
 

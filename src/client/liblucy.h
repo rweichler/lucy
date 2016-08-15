@@ -1,7 +1,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #if TARGET_OS_IPHONE
 #define ROCKETBOOTSTRAP_LOAD_DYNAMIC
-#include <LightMessaging.h>
+#include <LightMessaging/LightMessaging.h>
 
 LMConnection * l_ipc_create_port(const char *name);
 void l_ipc_free_port(LMConnection *connection);

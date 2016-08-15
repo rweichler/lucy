@@ -1,17 +1,9 @@
 #include "globals.h"
 
 #if TARGET_OS_IPHONE
-static void callback(CFMachPortRef port,
-                     LMMessage *request,
-                     CFIndex size,
-                     void *info)
+static void callback(LMServiceRef service, LMMessage *request)
 {
-    mach_port_t replyPort = request->head.msgh_remote_port;
-    if(size < sizeof(LMMessage)) {
-        LMSendReply(replyPort, NULL, 0);
-        LMResponseBufferFree((LMResponseBuffer *)request);
-        return;
-    }
+    mach_port_t replyPort = LMMessageGetReplyPort(request);
 
     const char *data = LMMessageGetData(request);
 
@@ -45,6 +37,11 @@ static void callback(CFMachPortRef port,
 void server_start()
 {
 #if TARGET_OS_IPHONE
-    LMStartService(LUCY_SERVER_NAME, CFRunLoopGetCurrent(), (CFMachPortCallBack)callback);
+    LMService service = {
+        LUCY_SERVER_NAME,
+        CFRunLoopGetCurrent(),
+        NULL
+    };
+    LMStartService(&service, callback);
 #endif
 }

@@ -1,12 +1,12 @@
 #import <Foundation/Foundation.h>
 #if TARGET_OS_IPHONE
 #define ROCKETBOOTSTRAP_LOAD_DYNAMIC
-#import <LightMessaging.h>
+#import <LightMessaging/LightMessaging.h>
 #endif
 #import <substrate.h>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include <luajit/lua.h>
+#include <luajit/lualib.h>
+#include <luajit/lauxlib.h>
 
 #define LUCY_SERVER_NAME "com.r333d.lucy.default"
 #define Log(format, ...) NSLog(@"Lucy: %@", [NSString stringWithFormat: format, ## __VA_ARGS__])

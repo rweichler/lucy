@@ -22,7 +22,7 @@
 #include <mach/mach.h>
 #include <mach/mach_init.h>
 #if LIGHTMESSAGING_USE_ROCKETBOOTSTRAP
-#include "rocketbootstrap.h"
+#include "../rocketbootstrap/rocketbootstrap.h"
 #else
 #include "bootstrap.h"
 #endif
@@ -40,8 +40,8 @@
 #endif
 
 typedef struct {
-	mach_port_t serverPort;
 	name_t serverName;
+	mach_port_t serverPort;
 } LMConnection;
 typedef LMConnection *LMConnectionRef;
 
@@ -64,6 +64,23 @@ typedef struct __LMResponseBuffer {
 	LMMessage message;
 	uint8_t slack[__LMMaxInlineSize - sizeof(LMMessage) + MAX_TRAILER_SIZE];
 } LMResponseBuffer;
+
+typedef struct {
+    // must be initialized before service start
+    name_t serverName;
+    CFRunLoopRef runLoop;
+    void *userInfo;
+    // initialized after service start
+    CFMachPortRef machPort;
+    CFRunLoopSourceRef machPortSource;
+} LMService;
+typedef LMService *LMServiceRef;
+
+typedef void (*LMCallback)(LMServiceRef, LMMessage *);
+typedef struct {
+    LMServiceRef service;
+    LMCallback callback;
+} _LMServiceUserInfo;
 
 static inline uint32_t LMBufferSizeForLength(uint32_t length)
 {
@@ -225,44 +242,64 @@ static inline void LMResponseBufferFree(LMResponseBuffer *responseBuffer)
 	}
 }
 
+static inline mach_port_t LMMessageGetReplyPort(LMMessage *request)
+{
+    return request->head.msgh_remote_port;
+}
+
+static inline void _LMInternalCallback(CFMachPortRef port, void *data, CFIndex size, void *vinfo);
+
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-static inline kern_return_t LMStartServiceWithUserInfo(name_t serverName, CFRunLoopRef runLoop, CFMachPortCallBack callback, void *userInfo)
+static inline kern_return_t LMStartService(LMServiceRef service, LMCallback callback)
 {
 	// TODO: Figure out what the real interface is, implement service stopping, handle failures correctly
+    _LMServiceUserInfo *userInfo = malloc(sizeof(_LMServiceUserInfo));
+    userInfo->service = service;
+    userInfo->callback = callback;
+
 	mach_port_t bootstrap = MACH_PORT_NULL;
 	task_get_bootstrap_port(mach_task_self(), &bootstrap);
 	CFMachPortContext context = { 0, userInfo, NULL, NULL, NULL };
-	CFMachPortRef machPort = CFMachPortCreate(kCFAllocatorDefault, callback, &context, NULL);
-	CFRunLoopSourceRef machPortSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, machPort, 0);
-	CFRunLoopAddSource(runLoop, machPortSource, kCFRunLoopCommonModes);
-	mach_port_t port = CFMachPortGetPort(machPort);
+    service->machPort = CFMachPortCreate(kCFAllocatorDefault, _LMInternalCallback, &context, NULL);
+	service->machPortSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, service->machPort, 0);
+	CFRunLoopAddSource(service->runLoop, service->machPortSource, kCFRunLoopCommonModes);
+	mach_port_t port = CFMachPortGetPort(service->machPort);
 #if LIGHTMESSAGING_USE_ROCKETBOOTSTRAP
-	rocketbootstrap_unlock(serverName);
+	rocketbootstrap_unlock(service->serverName);
 #endif
-	return bootstrap_register(bootstrap, serverName, port);
+	return bootstrap_register(bootstrap, service->serverName, port);
 }
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 
-static inline kern_return_t LMStartService(name_t serverName, CFRunLoopRef runLoop, CFMachPortCallBack callback)
+static inline void LMStopService(LMServiceRef service)
 {
-	return LMStartServiceWithUserInfo(serverName, runLoop, callback, NULL);
+    CFMachPortContext context;
+    CFMachPortGetContext(service->machPort, &context);
+    free(context.info);
+
+    CFRunLoopRemoveSource(service->runLoop, service->machPortSource, kCFRunLoopCommonModes);
+    CFMachPortInvalidate(service->machPort);
 }
 
-static inline kern_return_t LMCheckInService(name_t serverName, CFRunLoopRef runLoop, CFMachPortCallBack callback, void *userInfo)
+static inline kern_return_t LMCheckInService(LMServiceRef service, LMCallback callback)
 {
 	// TODO: Figure out what the real interface is, implement service stopping, handle failures correctly
+    _LMServiceUserInfo *userInfo = malloc(sizeof(_LMServiceUserInfo));
+    userInfo->service = service;
+    userInfo->callback = callback;
+
 	mach_port_t bootstrap = MACH_PORT_NULL;
 	task_get_bootstrap_port(mach_task_self(), &bootstrap);
 	CFMachPortContext context = { 0, userInfo, NULL, NULL, NULL };
 	mach_port_t port = MACH_PORT_NULL;
-	kern_return_t result = bootstrap_check_in(bootstrap, serverName, &port);
+	kern_return_t result = bootstrap_check_in(bootstrap, service->serverName, &port);
 	if (result)
 		return result;
-	CFMachPortRef machPort = CFMachPortCreateWithPort(kCFAllocatorDefault, port, callback, &context, NULL);
-	CFRunLoopSourceRef machPortSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, machPort, 0);
-	CFRunLoopAddSource(runLoop, machPortSource, kCFRunLoopCommonModes);
+	service->machPort = CFMachPortCreateWithPort(kCFAllocatorDefault, port, _LMInternalCallback, &context, NULL);
+	service->machPortSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, service->machPort, 0);
+	CFRunLoopAddSource(service->runLoop, service->machPortSource, kCFRunLoopCommonModes);
 #if LIGHTMESSAGING_USE_ROCKETBOOTSTRAP
-	rocketbootstrap_unlock(serverName);
+	rocketbootstrap_unlock(service->serverName);
 #endif
 	return 0;
 }
@@ -303,6 +340,20 @@ static inline kern_return_t LMSendReply(mach_port_t replyPort, const void *data,
 		mach_port_mod_refs(mach_task_self(), replyPort, MACH_PORT_RIGHT_SEND_ONCE, -1);
 	}
 	return err;
+}
+
+static inline void _LMInternalCallback(CFMachPortRef port, void *data, CFIndex size, void *vinfo)
+{
+    LMMessage *request = data;
+
+    if(size < sizeof(LMMessage)) {
+        mach_port_t replyPort = LMMessageGetReplyPort(request);
+        LMSendReply(replyPort, NULL, 0);
+        LMResponseBufferFree((LMResponseBuffer *)request);
+    } else {
+        _LMServiceUserInfo *info = vinfo;
+        info->callback(info->service, request);
+    }
 }
 
 static inline kern_return_t LMSendIntegerReply(mach_port_t replyPort, int integer)
