@@ -10,7 +10,8 @@ Come back here, and run the `aite` command.
 local deb = debber()
 deb.packageinfo = {
     Version = '0.5',
-    Depends = 'luajit, com.luapower.objc, objcbeagle, mobilesubstrate, com.rpetrich.rocketbootstrap',
+    Depends = 'luajit, mobilesubstrate, com.rpetrich.rocketbootstrap',
+    Conflicts = 'com.luapower.objc, objcbeagle',
     Package = 'com.r333d.lucy',
     Name = 'Lucy',
     Architecture = 'iphoneos-arm',
@@ -34,6 +35,10 @@ end
 
 function jb()
     os.pexecute("rm -rf layout")
+
+    -- compile objective beagle lib
+    beagle()
+
     -- setup builder
     local b = builder('apple')
     b.compiler = 'clang'
@@ -62,28 +67,54 @@ function jb()
     b.src = {
         'src/client/liblucy.c',
     }
-    b.output = 'layout/usr/local/lib/liblucy.dylib'
+    b.output = 'build/liblucy.dylib'
     b:link(b:compile())
+    fs.mkdir('layout/usr/local/lib')
+    os.pexecute('cp build/liblucy.dylib layout/usr/local/lib/')
     -- copy client executable
     fs.mkdir("layout/usr/local/bin")
-    local lua_lib = 'layout/usr/local/share/lua/5.1/lucy'
-    fs.mkdir(lua_lib)
-    os.pexecute("cp src/shell/* "..lua_lib)
-    os.pexecute("chmod +x "..lua_lib.."/init.lua")
-    os.pexecute("ln -s ../share/lua/5.1/lucy/init.lua layout/usr/local/bin/lucy")
+    local lpath = '/usr/local/share/lua/5.1'
+    fs.mkdir("layout"..lpath)
+    os.pexecute("    cp -r src/lua/* layout"..lpath)
+    os.pexecute("    chmod +x layout"..lpath.."/lucy/init.lua")
+    os.pexecute("    ln -s "..lpath.."/lucy/init.lua layout/usr/local/bin/lucy")
 
     -- compile server
     b.src = table.merge('src/client/liblucy.c', fs.scandir('src/server/*.m'))
     b.frameworks = {
         'Foundation'
     }
-    b.output = 'layout/Library/MobileSubstrate/DynamicLibraries/LucyServer.dylib'
+    b.output = 'build/LucyServer.dylib'
+    fs.mkdir('layout/Library/MobileSubstrate/DynamicLibraries')
+    os.pexecute('cp build/LucyServer.dylib layout/Library/MobileSubstrate/DynamicLibraries/')
     b:link(b:compile())
     -- copy server plist
-    os.pexecute("cp res/LucyServer.plist layout/Library/MobileSubstrate/DynamicLibraries/")
+    os.pexecute("    cp res/LucyServer.plist layout/Library/MobileSubstrate/DynamicLibraries/")
 
 
     deb:make_deb()
+end
+
+function beagle()
+    local b = builder('apple')
+    b.compiler = 'clang'
+    b.src = fs.scandir('src/beagle/*.m')
+    b.sdk = 'iphoneos'
+    b.archs = {
+        'armv7',
+        'arm64',
+    }
+    b.include_dirs = { -- this fucks it up
+        'src/lib',
+    }
+    b.frameworks = {
+        'Foundation',
+    }
+    b.build_dir = 'build'
+    b.output = 'build/libobjcbeagle.dylib'
+    b:link(b:compile())
+    fs.mkdir(deb.input..'/usr/local/lib')
+    os.pexecute('cp '..b.output..' '..deb.input..'/usr/local/lib')
 end
 
 function clean()
