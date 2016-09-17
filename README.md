@@ -27,13 +27,26 @@ Add http://cydia.r333d.com as a Cydia repo, and install the Lucy package from th
 
 * Mac OS X
 * LuaJIT (`brew install luajit`)
-* [aite](http://github.com/rweichler/aite) (for building) (I'm sorry)
 
-### The command you need to run
+### The commands you need to run
+
+1: Clone [aite](https://github.com/rweichler/aite) and put it somewhere
 
 ```
-git submodule update --init
-leos
+git clone https://github.com/rweichler/aite.git
+```
+
+2: Clone this and put it somewhere
+
+```
+git clone https://github.com/rweichler/lucy.git
+```
+
+3: cd into this repo and run aite
+
+```
+cd lucy
+/PATH/TO/AITE/main.lua
 ```
 
 That creates a new file `lucy.deb` which you can install on your device.
